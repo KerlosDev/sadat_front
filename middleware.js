@@ -2,24 +2,16 @@ import { NextResponse } from 'next/server';
 
 export function middleware(request) {
     const { pathname } = request.nextUrl;
-    
-    console.log('Middleware running for:', pathname);
 
-    // Get token from cookies or headers
-    const token = request.cookies.get('token')?.value ||
-        request.headers.get('authorization')?.replace('Bearer ', '');
+    // Get token from cookies (this is the primary method for SSR)
+    const token = request.cookies.get('token')?.value;
 
-    console.log('Token found:', !!token);
-
-    // Protected routes that require authentication
-    if (pathname.startsWith('/admin') || pathname.startsWith('/doctor') || pathname.startsWith('/student')) {
-        if (!token) {
-            console.log('Redirecting to login from:', pathname);
-            return NextResponse.redirect(new URL('/', request.url));
-        }
+    // If no token found for protected routes, redirect to login
+    if (!token) {
+        return NextResponse.redirect(new URL('/', request.url));
     }
 
-    // Allow everything else to pass through
+    // If token exists, allow access
     return NextResponse.next();
 }
 

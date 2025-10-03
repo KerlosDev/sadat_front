@@ -21,7 +21,20 @@ export function AuthProvider({ children }) {
 
     const checkAuth = async () => {
         try {
-            const token = localStorage.getItem('token');
+            // Check localStorage first, then cookies
+            let token = localStorage.getItem('token');
+            
+            // If no token in localStorage, check cookies
+            if (!token) {
+                const cookies = document.cookie.split(';');
+                const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+                if (tokenCookie) {
+                    token = tokenCookie.split('=')[1];
+                    // Sync with localStorage
+                    localStorage.setItem('token', token);
+                }
+            }
+            
             if (token) {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 const response = await axios.get('/api/auth/me');
@@ -29,6 +42,8 @@ export function AuthProvider({ children }) {
             }
         } catch (error) {
             localStorage.removeItem('token');
+            // Clear the cookie on error
+            document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
             delete axios.defaults.headers.common['Authorization'];
         } finally {
             setLoading(false);
@@ -45,8 +60,12 @@ export function AuthProvider({ children }) {
 
             const { token, user } = response.data;
 
-            // Store token
+            // Store token in localStorage for client-side access
             localStorage.setItem('token', token);
+            
+            // Store token in cookie for server-side middleware access
+            document.cookie = `token=${token}; path=/; ${rememberMe ? 'max-age=2592000;' : ''} SameSite=Lax`;
+            
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
             setUser(user);
@@ -67,6 +86,8 @@ export function AuthProvider({ children }) {
             // Even if logout fails on server, we still clear local storage
         } finally {
             localStorage.removeItem('token');
+            // Clear the cookie
+            document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
             delete axios.defaults.headers.common['Authorization'];
             setUser(null);
             toast.success('Logged out successfully');
