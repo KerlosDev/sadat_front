@@ -93,7 +93,7 @@ const ProfilePage = () => {
     const handleSaveProfile = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:3001/api/auth/profile', {
+            const response = await fetch('https://sadat-backend-og1p.onrender.com/api/auth/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

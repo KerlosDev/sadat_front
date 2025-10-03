@@ -37,10 +37,10 @@ const DoctorDashboard = () => {
 
             // Fetch doctor's groups and related data
             const [groupsRes, attendanceRes] = await Promise.all([
-                fetch('http://localhost:3001/api/groups/my-groups', {
+                fetch('https://sadat-backend-og1p.onrender.com/api/groups/my-groups', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 }),
-                fetch('http://localhost:3001/api/attendance/my-groups', {
+                fetch('https://sadat-backend-og1p.onrender.com/api/attendance/my-groups', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 })
             ]);
@@ -86,7 +86,7 @@ const DoctorDashboard = () => {
             const studentId = qrData;
 
             // Submit attendance
-            const response = await fetch('http://localhost:3001/api/attendance/scan', {
+            const response = await fetch('https://sadat-backend-og1p.onrender.com/api/attendance/scan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

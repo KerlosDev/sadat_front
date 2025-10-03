@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 const AuthContext = createContext({});
 
 // Configure axios defaults
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://sadat-backend-og1p.onrender.com';
 axios.defaults.withCredentials = true;
 
 export function AuthProvider({ children }) {

@@ -28,7 +28,7 @@ const MyGroupsPage = () => {
     const fetchGroups = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:3001/api/groups/my-groups', {
+            const response = await fetch('https://sadat-backend-og1p.onrender.com/api/groups/my-groups', {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             const data = await response.json();
