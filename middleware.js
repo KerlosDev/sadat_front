@@ -3,10 +3,20 @@ import { NextResponse } from 'next/server';
 export function middleware(request) {
     const { pathname } = request.nextUrl;
 
+    // Skip middleware for static files and API routes
+    if (
+        pathname.startsWith('/_next') ||
+        pathname.startsWith('/api') ||
+        pathname.startsWith('/static') ||
+        pathname.includes('.') // Files with extensions
+    ) {
+        return NextResponse.next();
+    }
+
     // Public routes that don't require authentication
     const publicRoutes = ['/', '/login'];
 
-    // Check if the current route is public
+    // Always allow access to public routes
     if (publicRoutes.includes(pathname)) {
         return NextResponse.next();
     }
@@ -15,8 +25,13 @@ export function middleware(request) {
     const token = request.cookies.get('token')?.value ||
         request.headers.get('authorization')?.replace('Bearer ', '');
 
-    // If no token and trying to access protected route, redirect to login
-    if (!token && (pathname.startsWith('/admin') || pathname.startsWith('/doctor') || pathname.startsWith('/student'))) {
+    // Protected routes - require authentication
+    const isProtectedRoute = pathname.startsWith('/admin') || 
+                           pathname.startsWith('/doctor') || 
+                           pathname.startsWith('/student');
+
+    // If trying to access protected route without token, redirect to login
+    if (isProtectedRoute && !token) {
         const loginUrl = new URL('/', request.url);
         return NextResponse.redirect(loginUrl);
     }
